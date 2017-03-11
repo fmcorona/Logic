@@ -15,7 +15,9 @@ public class Logic {
      * @param args the command line arguments
      */
     public static void main(String[] args) {        
-        truthTable table = new truthTable("a b > a c = &"); // (a > b) & (a = c) en notación postfija (Polaca Inversa)
+        //truthTable table = new truthTable("a b > a c = &"); // (a > b) & (a = c) en notación postfija (Polaca Inversa)
+        truthTable table = new truthTable("a b - & - -"); // --(a & -b) en notación postfija (Polaca Inversa)
+        //truthTable table = new truthTable("a b ^"); // a ^ b (disyunción eclusiva)
         table.printClauses();
         table.printTable();
     }

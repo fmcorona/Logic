@@ -112,11 +112,20 @@ public class truthTable {
             }
 
             //Evaluación
-            String operators = "&|>=";
+            String operators = "-&|^>=";
 
             while (!StackE.isEmpty()) {
-                if (operators.contains("" + StackE.peek())) {                
-                    StackP.push(evaluate(StackE.pop(), StackP.pop(), StackP.pop()) + "");
+                if (operators.contains("" + StackE.peek())) {
+                    if(StackE.peek().equals("-")) { // Si hay una negación, se evalua
+                        if(StackP.pop().equals("T")) {
+                            StackP.push("F");
+                        } else {
+                            StackP.push("T");
+                        }
+                        StackE.pop();
+                    } else { 
+                        StackP.push(evaluate(StackE.pop(), StackP.pop(), StackP.pop()) + "");
+                    }
                 } else {
                     StackP.push(StackE.pop());
                 }
@@ -157,15 +166,16 @@ public class truthTable {
             val_b = 0;
         }
 
-        if (op.equals("&") && val_a + val_b == 2) return "T";
-        if (op.equals("|") && val_a + val_b >= 1) return "T";
-        if (op.equals(">")) {
+        if(op.equals("&") && val_a + val_b == 2) return "T"; //And
+        if(op.equals("|") && val_a + val_b >= 1) return "T"; //Or
+        if(op.equals("^") && val_a != val_b) return "T"; //Exclusive Or
+        if(op.equals(">")) { //Implication
             if(val_a == 1 && val_b == 0)
                 return "F";
 
             return "T";
         }
-        if (op.equals("=") && val_a == val_b) return "T";
+        if(op.equals("=") && val_a == val_b) return "T"; //Equivalence
 
         return "F";
     }

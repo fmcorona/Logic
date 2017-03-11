@@ -7,7 +7,7 @@ package logic;
 
 /**
  *
- * @author Miguel Corona
+ * @author fmcorona
  */
 public class Logic {
 
@@ -16,10 +16,8 @@ public class Logic {
      */
     public static void main(String[] args) {        
         //truthTable table = new truthTable("a b > a c = &"); // (a > b) & (a = c) en notación postfija (Polaca Inversa)
-        truthTable table = new truthTable("a b - & - -"); // --(a & -b) en notación postfija (Polaca Inversa)
-        //truthTable table = new truthTable("a b ^"); // a ^ b (disyunción eclusiva)
-        table.printClauses();
-        table.printTable();
+        truthTable table = new truthTable("a - b - & a c - & | a - c & |"); // (-a & -b) | (a & -c) | (-a & c)
+        table.print();
     }
     
 }

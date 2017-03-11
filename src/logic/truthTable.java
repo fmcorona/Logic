@@ -13,7 +13,7 @@ import java.util.Stack;
 
 /**
  *
- * @author Miguel Corona
+ * @author fmcorona
  */
 public class truthTable {
     private final String P;
@@ -29,39 +29,21 @@ public class truthTable {
         obtainClauses();
         
         row = (int) pow(2,clauses.size());
-        col = clauses.size() + 1;
+        col = 2*clauses.size() + 1;
         
         table = new String[row][col];  
-        
-        init();        
+                
         build();
-    }
+    } //End TruthTable
     
-    private void obtainClauses() {
-        clauses.addAll(Arrays.asList(P.split(" ")));
-        Collections.sort(clauses);
+    private void build() {
+        init();
+        fillColumn(clauses.size(), P);
         
-        for(int i = 0; i < clauses.size(); i++){            
-            if(!Character.isLetter(clauses.get(i).charAt(0))) {
-                clauses.remove(i);
-                i--; //Se recorrer el índice, porque se eliminó un elemento de clauses
-            }
-            else if(i > 0 && clauses.get(i).equals(clauses.get(i - 1))) {
-                clauses.remove(i);
-                i--; //Se recorrer el índice, porque se eliminó un elemento de clauses
-            }
+        for(int i = 0; i < clauses.size(); i++) { 
+            majorClause(clauses.get(i));
         }
-    }
-    
-    public void printClauses() {        
-        System.out.print("Clauses: ");
-        
-        for(int i = 0; i < clauses.size(); i++) {
-            System.out.print(clauses.get(i) + " ");
-        }
-        
-        System.out.println("");
-    }
+    } //End build
     
     private void init() {
         boolean put_true = true;
@@ -91,15 +73,42 @@ public class truthTable {
             amoutTrue /=2;
             amoutFalse /=2;
         }
-    }// End init
+    } //End init
     
-    public void build() {
+    private void obtainClauses() {
+        clauses.addAll(Arrays.asList(P.split(" ")));
+        Collections.sort(clauses);
+        
+        for(int i = 0; i < clauses.size(); i++){            
+            if(!Character.isLetter(clauses.get(i).charAt(0))) {
+                clauses.remove(i);
+                i--; //Se recorrer el índice, porque se eliminó un elemento de clauses
+            }
+            else if(i > 0 && clauses.get(i).equals(clauses.get(i - 1))) {
+                clauses.remove(i);
+                i--; //Se recorrer el índice, porque se eliminó un elemento de clauses
+            }
+        }
+    } //End obtainClauses
+    
+    private void majorClause(String a) {
+        String Pa, Pa_false = P, Pa_true = P;
+        
+        Pa_false = Pa_false.replace(a.charAt(0), 'F');
+        Pa_true = Pa_true.replace(a.charAt(0), 'T');
+        
+        Pa = Pa_true + ' ' + Pa_false + ' ' + '^';
+        
+        fillColumn(clauses.size() + clauses.indexOf(a) + 1, Pa);        
+    } //End majorClause
+    
+    private void fillColumn(int c, String p) {        
         Stack<String> StackE = new Stack<> ();
         Stack<String> StackP = new Stack<> ();
         String expr;
         
         for(int k = 0; k < row; k++) {
-            expr = P;
+            expr = p;
             
             for(int i = 0; i < clauses.size(); i++) { //Asignar valores, de la tabla, a las clausulas
                 expr = expr.replace(clauses.get(i).charAt(0), table[k][i].charAt(0));
@@ -110,13 +119,12 @@ public class truthTable {
             for(int i = post.length - 1; i >= 0; i--) {
                 StackE.push(post[i]);
             }
-
-            //Evaluación
+            
             String operators = "-&|^>=";
 
             while (!StackE.isEmpty()) {
                 if (operators.contains("" + StackE.peek())) {
-                    if(StackE.peek().equals("-")) { // Si hay una negación, se evalua
+                    if(StackE.peek().equals("-")) { // Si hay una negación, se evalúa
                         if(StackP.pop().equals("T")) {
                             StackP.push("F");
                         } else {
@@ -131,25 +139,9 @@ public class truthTable {
                 }
             }
             
-            table[k][clauses.size()] = StackP.pop();
+            table[k][c] = StackP.pop();
         }
-    } //End build
-    
-    public void printTable() {        
-        System.out.println("Truth table: " + P);
-        for(int i = 0; i < clauses.size(); i++) {
-            System.out.print(clauses.get(i) + "\t");
-        }
-        
-        System.out.println("P");
-        
-        for(int i = 0; i < row; i++) {
-            for(int j = 0; j < clauses.size() + 1; j++) {
-                System.out.print(table[i][j] + "\t");
-            }
-            System.out.println();
-        }
-    }
+    } //End fillColumn
     
     private String evaluate(String op, String b, String a) { // a op b
         int val_a = 0, val_b = 0;
@@ -178,6 +170,28 @@ public class truthTable {
         if(op.equals("=") && val_a == val_b) return "T"; //Equivalence
 
         return "F";
-    }
+    } //End evaluate
+    
+    public void print() {        
+        System.out.println("Truth table: " + P);
+        for(int i = 0; i < clauses.size(); i++) {
+            System.out.print(clauses.get(i) + "\t");
+        }
+        
+        System.out.print("P\t");
+        
+        for(int i = 0; i < clauses.size(); i++) {
+            System.out.print("P" + clauses.get(i) + "\t");
+        }
+        
+        System.out.println();
+        
+        for(int i = 0; i < row; i++) {
+            for(int j = 0; j < 2*clauses.size() + 1; j++) {
+                System.out.print(table[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    } //End print
     
 }

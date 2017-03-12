@@ -16,8 +16,14 @@ public class Logic {
      */
     public static void main(String[] args) {        
         //truthTable table = new truthTable("a b > a c = &"); // (a > b) & (a = c) en notación postfija (Polaca Inversa)
-        truthTable table = new truthTable("a - b - & a c - & | a - c & |"); // (-a & -b) | (a & -c) | (-a & c)
+        //truthTable table = new truthTable("a - b - & a c - & | a - c & |"); // (-a & -b) | (a & -c) | (-a & c)
+        //truthTable table = new truthTable("a b - c | &"); // a & (-b | c)
+        truthTable table = new truthTable("a b | c d & |"); // a | b | (c & d)
+        
         table.print();
+        table.GACC();
+        table.CACC();
+        table.RACC();
     }
     
 }

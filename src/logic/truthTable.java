@@ -17,6 +17,7 @@ import java.util.Stack;
  */
 public class truthTable {
     private final String P;
+    private final mClause[] Px;
     private final ArrayList<String> clauses;
     private final int row;
     private final int col;
@@ -28,7 +29,13 @@ public class truthTable {
         
         obtainClauses();
         
-        row = (int) pow(2,clauses.size());
+        Px = new mClause[clauses.size()];
+        
+        for(int i = 0; i < clauses.size(); i++) {
+            Px[i] = new mClause();
+        }
+        
+        row = (int) pow(2, clauses.size());
         col = 2*clauses.size() + 1;
         
         table = new String[row][col];  
@@ -140,6 +147,17 @@ public class truthTable {
             }
             
             table[k][c] = StackP.pop();
+            
+            //Si c es una columna de algun Px, obtenemos la posición donde Px = T
+            //y los separamos por los valores, T o F, de x
+            //c - clauses.size() - 1 es el número de columna de la clausula x
+            if(c > clauses.size() && table[k][c].equals("T")) {
+                if(table[k][c - clauses.size() - 1].equals("T")) {
+                    Px[c - clauses.size() - 1].addT(k + 1);
+                } else {
+                    Px[c - clauses.size() - 1].addF(k + 1);
+                }
+            }
         }
     } //End fillColumn
     
@@ -172,8 +190,82 @@ public class truthTable {
         return "F";
     } //End evaluate
     
+    public void GACC() {
+        System.out.println("The result for GACC is:"
+                + "\nMajor Clause\tSet of possible tests");
+        
+        for(int i = 0; i < clauses.size(); i++) {
+            System.out.print("     " + clauses.get(i) + "\t\t");
+            
+            for(int j = 0; j < Px[i].sizeT(); j++) {
+                for(int k = 0; k < Px[i].sizeF(); k++) {
+                    System.out.print("(" + Px[i].getT(j) + ","+ Px[i].getF(k) + ") ");
+                }
+            }
+            
+            System.out.println();
+        }
+    }
+    
+    public void CACC() {
+        System.out.println("The result for CACC is:"
+                + "\nMajor Clause\tSet of possible tests");
+        
+        for(int i = 0; i < clauses.size(); i++) {
+            System.out.print("     " + clauses.get(i) + "\t\t");
+            
+            for(int j = 0; j < Px[i].sizeT(); j++) {
+                for(int k = 0; k < Px[i].sizeF(); k++) {
+                    //Es Px[i].getT(j) - 1 porque cuando se hace Px[index].addT(row) row representa
+                    //el número de renglón más 1. Análogamente para valueOfPredicate(Px[i].getF(k) - 1)
+                    if(!valueOfPredicate(Px[i].getT(j) - 1).equals(valueOfPredicate(Px[i].getF(k) - 1))) {
+                        System.out.print("(" + Px[i].getT(j) + ","+ Px[i].getF(k) + ") ");
+                    }
+                }
+            }
+            
+            System.out.println();
+        }
+    }
+    
+    public void RACC() {
+        System.out.println("The result for RACC is:"
+                + "\nMajor Clause\tSet of possible tests");
+        
+        for(int i = 0; i < clauses.size(); i++) {
+            System.out.print("     " + clauses.get(i) + "\t\t");
+            
+            for(int j = 0; j < Px[i].sizeT(); j++) {
+                for(int k = 0; k < Px[i].sizeF(); k++) {
+                    if(!valueOfPredicate(Px[i].getT(j) - 1).equals(valueOfPredicate(Px[i].getF(k) - 1))) {
+                        if(compareMinorClauses(i, Px[i].getT(j) - 1, Px[i].getF(k) - 1)) {
+                            System.out.print("(" + Px[i].getT(j) + ","+ Px[i].getF(k) + ") ");
+                        }
+                    }
+                }
+            }
+            
+            System.out.println();
+        }        
+    }
+    
+    private String valueOfPredicate(int r) {
+        return table[r][clauses.size()];
+    }
+    
+    private boolean compareMinorClauses(int col_mclause, int r1, int r2) {
+        for(int i = 0; i < clauses.size(); i++) {
+            if(i != col_mclause && !table[r1][i].equals(table[r2][i]))
+                return false;
+        }
+        
+        return true;
+    }
+    
     public void print() {        
-        System.out.println("Truth table: " + P);
+        System.out.println("Truth table of\t " + P + ":");
+        System.out.print("row\t");
+        
         for(int i = 0; i < clauses.size(); i++) {
             System.out.print(clauses.get(i) + "\t");
         }
@@ -187,6 +279,8 @@ public class truthTable {
         System.out.println();
         
         for(int i = 0; i < row; i++) {
+            System.out.print(" " + (i + 1) + "\t");
+            
             for(int j = 0; j < 2*clauses.size() + 1; j++) {
                 System.out.print(table[i][j] + "\t");
             }

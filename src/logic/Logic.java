@@ -5,6 +5,11 @@
  */
 package logic;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.BufferedReader;
+import java.io.IOException;
+
 /**
  *
  * @author fmcorona
@@ -14,16 +19,32 @@ public class Logic {
     /**
      * @param args the command line arguments
      */
-    public static void main(String[] args) {        
-        //truthTable table = new truthTable("a b > a c = &"); // (a > b) & (a = c) en notación postfija (Polaca Inversa)
-        //truthTable table = new truthTable("a - b - & a c - & | a - c & |"); // (-a & -b) | (a & -c) | (-a & c)
-        //truthTable table = new truthTable("a b - c | &"); // a & (-b | c)
-        truthTable table = new truthTable("a b | c d & |"); // a | b | (c & d)
+    public static void main(String[] args) {
+        String predicate = read("predicate.txt");
         
-        table.print();
-        table.GACC();
-        table.CACC();
-        table.RACC();
+        if(!predicate.equals("")) {
+            TruthTable table = new TruthTable(predicate);
+        
+            table.print();
+            table.GACC();
+            table.CACC();
+            table.RACC();
+        }        
     }
     
+    public static String read(String name) {
+        String predicate = "";
+
+        File file = new File(name);
+        
+        try {
+            FileReader fr = new FileReader(file);
+            BufferedReader br = new BufferedReader(fr);
+            predicate = br.readLine();
+        } catch(IOException e) {
+            System.out.println("File does not exist:\n" + e);
+        }
+        
+        return predicate;
+    }    
 }

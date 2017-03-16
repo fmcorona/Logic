@@ -9,31 +9,31 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Miguel
+ * @author fmcorona
  */
-public class mClause {
-    private ArrayList<Integer> T;
-    private ArrayList<Integer> F;
+public class MClause {
+    private final ArrayList<Integer> T;
+    private final ArrayList<Integer> F;
 
-    public mClause() {
+    public MClause() {
         T = new ArrayList<>();
         F = new ArrayList<>();
     }
     
-    public void addT(int x) {
-        T.add(x);
+    public void addT(int i) {
+        T.add(i);
     }
     
-    public void addF(int x) {
-        F.add(x);
+    public void addF(int i) {
+        F.add(i);
     }
     
-    public int getT(int index) {
-        return T.get(index);
+    public int getT(int i) {
+        return T.get(i);
     }
     
-    public int getF(int index) {
-        return F.get(index);
+    public int getF(int i) {
+        return F.get(i);
     }
     
     public int sizeT() {

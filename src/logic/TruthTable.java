@@ -15,24 +15,26 @@ import java.util.Stack;
  *
  * @author fmcorona
  */
-public class truthTable {
-    private final String P;
-    private final mClause[] Px;
+public class TruthTable {
+    private final String p_postfix;
+    private final String p_infix;
+    private final MClause[] Px;
     private final ArrayList<String> clauses;
     private final int row;
     private final int col;
     private final String[][] table;
     
-    public truthTable(String P) {
-        this.P = P;
+    public TruthTable(String predicate) {
+        this.p_infix = cleanString(predicate);
+        this.p_postfix = infixToPostfix(predicate);
         clauses = new ArrayList<>();
         
         obtainClauses();
         
-        Px = new mClause[clauses.size()];
+        Px = new MClause[clauses.size()];
         
         for(int i = 0; i < clauses.size(); i++) {
-            Px[i] = new mClause();
+            Px[i] = new MClause();
         }
         
         row = (int) pow(2, clauses.size());
@@ -45,7 +47,7 @@ public class truthTable {
     
     private void build() {
         init();
-        fillColumn(clauses.size(), P);
+        fillColumn(clauses.size(), p_postfix);
         
         for(int i = 0; i < clauses.size(); i++) { 
             majorClause(clauses.get(i));
@@ -82,8 +84,76 @@ public class truthTable {
         }
     } //End init
     
+    private String infixToPostfix(String expr) {
+        Stack<String> InStack = new Stack <>();
+        Stack<String> OpStack = new Stack <>();
+        Stack<String> OutStack = new Stack <>();
+        String[] arrayInfix;        
+        
+        expr = cleanString(expr);        
+        arrayInfix = expr.split(" ");
+        
+        for (int i = arrayInfix.length - 1; i >= 0; i--) {
+            InStack.push(arrayInfix[i]);
+        }
+        
+        while (!InStack.isEmpty()) {
+            switch (hierarchy(InStack.peek())){
+                case 1: //"("
+                    OpStack.push(InStack.pop());
+                    break;
+                    
+                case 3: case 4: case 5: //"-", "&", "|", "^", ">", "="
+                    while(hierarchy(OpStack.peek()) >= hierarchy(InStack.peek())) {
+                        OutStack.push(OpStack.pop());
+                    }
+                    OpStack.push(InStack.pop());
+                    break; 
+                
+                case 2: //")"
+                    while(!OpStack.peek().equals("(")) {
+                        OutStack.push(OpStack.pop());
+                    }
+                    OpStack.pop();
+                    InStack.pop();
+                    break;
+                    
+                default:
+                    OutStack.push(InStack.pop()); 
+            } 
+        }
+        
+        return OutStack.toString().replaceAll("[\\]\\[,]", "");
+    } //End infixToPostfix
+    
+    private String cleanString(String s) {
+        String symbols = "-&|^>=()";
+        String str = "";
+        
+        s = s.replaceAll(" ", "");
+        s = "(" + s + ")";
+        
+        //Espacios entre conectivos lógicos
+        for (int i = 0; i < s.length(); i++) {
+            if (symbols.contains("" + s.charAt(i))) {
+                str += " " + s.charAt(i) + " ";
+            }else str += s.charAt(i);
+        }
+        return str.replaceAll("\\s+", " ").trim();
+    } //End cleanString
+    
+    private int hierarchy(String op) {    
+        if (op.equals("-")) return 5;
+        if (op.equals(">") || op.equals("=")) return 4;
+        if (op.equals("&") || op.equals("|") || op.equals("^")) return 3;
+        if (op.equals(")")) return 2;
+        if (op.equals("(")) return 1;
+
+        return 0;
+    } //End hierarchy
+    
     private void obtainClauses() {
-        clauses.addAll(Arrays.asList(P.split(" ")));
+        clauses.addAll(Arrays.asList(p_postfix.split(" ")));
         Collections.sort(clauses);
         
         for(int i = 0; i < clauses.size(); i++){            
@@ -99,7 +169,7 @@ public class truthTable {
     } //End obtainClauses
     
     private void majorClause(String a) {
-        String Pa, Pa_false = P, Pa_true = P;
+        String Pa, Pa_false = p_postfix, Pa_true = p_postfix;
         
         Pa_false = Pa_false.replace(a.charAt(0), 'F');
         Pa_true = Pa_true.replace(a.charAt(0), 'T');
@@ -191,7 +261,7 @@ public class truthTable {
     } //End evaluate
     
     public void GACC() {
-        System.out.println("The result for GACC is:"
+        System.out.println("\nThe result for GACC is:"
                 + "\nMajor Clause\tSet of possible tests");
         
         for(int i = 0; i < clauses.size(); i++) {
@@ -205,10 +275,10 @@ public class truthTable {
             
             System.out.println();
         }
-    }
+    } //End GACC
     
     public void CACC() {
-        System.out.println("The result for CACC is:"
+        System.out.println("\nThe result for CACC is:"
                 + "\nMajor Clause\tSet of possible tests");
         
         for(int i = 0; i < clauses.size(); i++) {
@@ -226,10 +296,10 @@ public class truthTable {
             
             System.out.println();
         }
-    }
+    } //End CACC
     
     public void RACC() {
-        System.out.println("The result for RACC is:"
+        System.out.println("\nThe result for RACC is:"
                 + "\nMajor Clause\tSet of possible tests");
         
         for(int i = 0; i < clauses.size(); i++) {
@@ -247,11 +317,11 @@ public class truthTable {
             
             System.out.println();
         }        
-    }
+    } //End RACC
     
     private String valueOfPredicate(int r) {
         return table[r][clauses.size()];
-    }
+    } //End valueOfPredicate
     
     private boolean compareMinorClauses(int col_mclause, int r1, int r2) {
         for(int i = 0; i < clauses.size(); i++) {
@@ -260,10 +330,10 @@ public class truthTable {
         }
         
         return true;
-    }
+    } //End compareMinorClauses
     
     public void print() {        
-        System.out.println("Truth table of\t " + P + ":");
+        System.out.println("Truth table of " + p_infix + ":");
         System.out.print("row\t");
         
         for(int i = 0; i < clauses.size(); i++) {

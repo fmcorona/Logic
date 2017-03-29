@@ -29,10 +29,19 @@ public class Logic {
             table.GACC();
             table.CACC();
             table.RACC();
+            table.GICC();
+            table.RICC();
         }        
-    }
+    } //End main
     
-    public static String read(String name) {
+    /**
+     *Lee un archivo y regresa el predicado que se va a analizar.
+     *En caso de que el archivo no exista imprime un mensaje de error.
+     * 
+     * @param name  nombre del archivo donde está el predicado
+     * @return      predicado
+     */
+    private static String read(String name) {
         String predicate = "";
 
         File file = new File(name);
@@ -46,5 +55,6 @@ public class Logic {
         }
         
         return predicate;
-    }    
+    } //End read
+    
 }

@@ -171,7 +171,7 @@ public class TruthTable {
     } //End cleanString
     
     /**
-     *Regresa la precedencia, jerarquía, de un operador lógico.
+     *Regresa la precedencia, jerarquía, del operador lógico op.
      * 
      * @param op    operador lógica
      * @return      valor jerárquico del operador o 0 en caso de no ser un
@@ -194,9 +194,9 @@ public class TruthTable {
         clauses.addAll(Arrays.asList(p_postfix.split(" ")));
         Collections.sort(clauses);
         
-        for(int i = 0; i < clauses.size(); i++){            
+        for(int i = 0; i < clauses.size(); i++){
             if(!Character.isLetter(clauses.get(i).charAt(0))) {
-                clauses.remove(i);
+                clauses.remove(i);                
                 i--; //Se recorrer el índice, porque se eliminó un elemento de clauses
             }
             else if(i > 0 && clauses.get(i).equals(clauses.get(i - 1))) {
@@ -215,9 +215,9 @@ public class TruthTable {
       */
     private String majorClause(String a) {
         String Pa_false = p_postfix, Pa_true = p_postfix;
-        
-        Pa_false = Pa_false.replace(a.charAt(0), 'F');
-        Pa_true = Pa_true.replace(a.charAt(0), 'T');
+                
+        Pa_false = Pa_false.replaceAll(a, "F");
+        Pa_true = Pa_true.replaceAll(a, "T");
         
         return Pa_true + ' ' + Pa_false + ' ' + '^';
     } //End majorClause
@@ -236,8 +236,8 @@ public class TruthTable {
         for(int k = 0; k < row; k++) {
             expr = p;
             
-            for(int i = 0; i < clauses.size(); i++) { //Asignar valores, de la tabla, a las cláusulas
-                expr = expr.replace(clauses.get(i).charAt(0), table[k][i].charAt(0));
+            for(int i = 0; i < clauses.size(); i++) {
+                expr = expr.replaceAll(clauses.get(i), table[k][i]); 
             }
 
             String[] post = expr.split(" ");
@@ -456,7 +456,7 @@ public class TruthTable {
     } //End RICC    
     
     /**
-     *Imprime los pares (m,n), o un indica que no hay pares, para el criterio GICC.
+     *Imprime los pares (m,n), o indica que no hay pares, para el criterio GICC.
      * 
      * @param a_true        ArrayList que contiene los posibles valores de m para los pares (m,n), para
      *                      los cuales el valor del predicado "a" es verdadero
@@ -484,7 +484,7 @@ public class TruthTable {
     }
     
     /**
-     *Imprime los pares (m,n), o un indica que no hay pares, para el criterio RICC.
+     *Imprime los pares (m,n), o indica que no hay pares, para el criterio RICC.
      * 
      * @param col_clause    número de columna, de la tabla, en la cual se encuentra la cláusula
      *                      para la cual se van a imprimir los pares (m,n). Se utiliza como
